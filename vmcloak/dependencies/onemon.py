@@ -47,11 +47,7 @@ class Onemon(Dependency):
 
         buf = pe2.write()
 
-        count = 0
-        for idx in xrange(len(blob)):
-            if blob[idx] != buf[idx]:
-                count += 1
-
+        count = sum(blob[idx] != buf[idx] for idx in xrange(len(blob)))
         if count > 8:
             log.warning("Something went wrong rebuilding winload.exe!")
             return
@@ -79,11 +75,7 @@ class Onemon(Dependency):
 
         buf = pe2.write()
 
-        count = 0
-        for idx in xrange(len(blob)):
-            if blob[idx] != buf[idx]:
-                count += 1
-
+        count = sum(blob[idx] != buf[idx] for idx in xrange(len(blob)))
         if count > 7:
             log.warning("Something went wrong rebuilding ntoskrnl.exe!")
             return

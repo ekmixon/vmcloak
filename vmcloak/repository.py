@@ -19,7 +19,7 @@ deps_path = os.path.join(conf_path, "deps")
 iso_dst_path = os.path.join(conf_path, "iso")
 
 repository = os.path.join(conf_path, "repository.db")
-engine = create_engine("sqlite:///%s" % repository)
+engine = create_engine(f"sqlite:///{repository}")
 Base = declarative_base()
 Session = sessionmaker(bind=engine)
 
@@ -72,8 +72,11 @@ class Snapshot(Base):
 if not os.path.isdir(conf_path):
     os.mkdir(conf_path)
 
-db_exists = os.path.exists(repository)
-if not db_exists:
+if db_exists := os.path.exists(repository):
+    if not engine.dialect.has_table(engine, AlembicVersion.__tablename__):
+        AlembicVersion.__table__.create(engine)
+
+else:
     Base.metadata.create_all(engine)
     ses = Session()
     try:
@@ -83,10 +86,6 @@ if not db_exists:
         ses.commit()
     finally:
         ses.close()
-
-elif db_exists:
-    if not engine.dialect.has_table(engine, AlembicVersion.__tablename__):
-        AlembicVersion.__table__.create(engine)
 
 if not os.path.isdir(image_path):
     os.mkdir(image_path)

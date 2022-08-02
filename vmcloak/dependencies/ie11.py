@@ -68,7 +68,7 @@ class IE11(Dependency):
         # https://support.microsoft.com/en-us/help/182569/internet-explorer-security-zones-registry-entries-for-advanced-users
         # disable protected mode for all zones for all users
         # https://superuser.com/questions/1031225/what-is-the-registry-setting-to-enable-protected-mode-in-a-specific-zone
-        for zone in range(0, 5):
+        for zone in range(5):
             self.a.execute(
                 "reg add \"HKEY_LOCAL_MACHINE\\Software\\Policies\\"
                 "Microsoft\\Windows\\CurrentVersion\\Internet Settings\\Zones\\%s\" "

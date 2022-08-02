@@ -15,7 +15,7 @@ def load_hwconf(profile, dirpath=HWCONF_PATH):
     ret = {}
 
     if profile is not None:
-        files = ["%s.json" % profile]
+        files = [f"{profile}.json"]
     else:
         # Load profiles that ship with VMCloak.
         files = os.listdir(dirpath)

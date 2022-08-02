@@ -6,4 +6,4 @@ from vmcloak.abstract import Dependency
 from vmcloak.misc import import_plugins
 
 plugins = import_plugins(__file__, "vmcloak.dependencies", globals(), Dependency)
-names = dict((plugin.name, plugin) for plugin in plugins)
+names = {plugin.name: plugin for plugin in plugins}

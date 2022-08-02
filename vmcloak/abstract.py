@@ -145,7 +145,7 @@ class Machinery(object):
 
         def _init_vm(path, fields):
             for key, value in fields.items():
-                key = path + "/" + key
+                key = f"{path}/{key}"
                 if isinstance(value, dict):
                     _init_vm(key, value)
                 else:
@@ -316,7 +316,7 @@ class WindowsAutounattended(OperatingSystem):
 
         buf = open(os.path.join(self.path, "autounattend.xml"), "rb").read()
         for key, value in values.items():
-            buf = buf.replace("@%s@" % key, value)
+            buf = buf.replace(f"@{key}@", value)
 
         return buf
 
@@ -344,11 +344,7 @@ class WindowsAutounattended(OperatingSystem):
                 product = preference
                 break
         else:
-            if products:
-                product = products[0]
-            else:
-                product = self.preference[0]
-
+            product = products[0] if products else self.preference[0]
         if self.product and self.product.lower() not in self.preference:
             log.error(
                 "The product version of %s that was specified on the "
@@ -449,14 +445,17 @@ class Dependency(object):
                 continue
 
             if "version" in self.exe and self.exe["version"] == "latest":
-                log.info("Got latest version '{}' from '{}', no checksum available!".format(self.filename, url))
+                log.info(
+                    f"Got latest version '{self.filename}' from '{url}', no checksum available!"
+                )
+
                 break
 
             if sha1_file(self.filepath) == self.exe["sha1"]:
-                log.info("Got file '{}' from '{}', with matching checksum.".format(self.filename, url))
+                log.info(f"Got file '{self.filename}' from '{url}', with matching checksum.")
                 break
             else:
-                log.warn("The checksum of '{}' from '{}' didn't match!".format(self.filename, url))
+                log.warn(f"The checksum of '{self.filename}' from '{url}' didn't match!")
                 os.remove(self.filepath)
 
         if not os.path.exists(self.filepath):

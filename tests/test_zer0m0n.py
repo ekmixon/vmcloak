@@ -7,7 +7,7 @@ import hashlib
 from vmcloak.dependencies.zer0m0n import Zer0m0n
 
 def patch_file(method, filename):
-    blob = open("tests/files/%s" % filename, "rb").read()
+    blob = open(f"tests/files/{filename}", "rb").read()
     return hashlib.md5(method(blob)).hexdigest()
 
 def patch_winload(filename):

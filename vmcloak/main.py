@@ -95,7 +95,7 @@ def clone(name, outname):
         log.error("Image not found: %s", name)
         exit(1)
 
-    outpath = os.path.join(image_path, "%s.vdi" % outname)
+    outpath = os.path.join(image_path, f"{outname}.vdi")
 
     m = VirtualBox(None)
     m.clone_hd(image.path, outpath)
@@ -331,12 +331,12 @@ def install(name, dependencies, vm_visible, vrde, vrde_port, recommended, debug)
     a.ping()
 
     settings = {}
-    deps = []
+    deps = [
+        (dependency.name, dependency.default)
+        for dependency in vmcloak.dependencies.plugins
+        if recommended and dependency.recommended
+    ]
 
-    # Include all recommended dependencies if requested.
-    for dependency in vmcloak.dependencies.plugins:
-        if recommended and dependency.recommended:
-            deps.append((dependency.name, dependency.default))
 
     # Fetch the configuration settings off of the arguments.
     for dependency in dependencies:
@@ -657,9 +657,10 @@ def migrate(revision):
 
     try:
         subprocess.check_call(
-            ["alembic", "upgrade", "%s" % revision],
-            cwd=os.path.join(VMCLOAK_ROOT, "data", "db_migration")
+            ["alembic", "upgrade", f"{revision}"],
+            cwd=os.path.join(VMCLOAK_ROOT, "data", "db_migration"),
         )
+
     except subprocess.CalledProcessError as e:
         log.exception("Database migration failed: %s", e)
         exit(1)

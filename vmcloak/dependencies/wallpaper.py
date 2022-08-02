@@ -29,10 +29,11 @@ class Wallpaper(Dependency):
             self.a.environ("USERPROFILE"), "Pictures", "wall.jpg"
         )
 
-        if not self.filepath:
-            f = io.BytesIO(requests.get(random.choice(self.doges)).content)
-        else:
-            f = open(self.filepath, "rb")
+        f = (
+            open(self.filepath, "rb")
+            if self.filepath
+            else io.BytesIO(requests.get(random.choice(self.doges)).content)
+        )
 
         self.a.upload(uploadpath, f)
 

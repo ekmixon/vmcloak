@@ -10,7 +10,7 @@ from vmcloak.swarm import Swarm
 from vmcloak.exceptions import SwarmError
 
 def f(filename):
-    return Swarm(os.path.join("tests", "files", "%s.swarm" % filename))
+    return Swarm(os.path.join("tests", "files", f"{filename}.swarm"))
 
 def tmp(content):
     fd, filepath = tempfile.mkstemp()

@@ -17,7 +17,7 @@ class Agent(object):
 
     def get(self, method, *args, **kwargs):
         """Wrapper around GET requests."""
-        url = "http://%s:%s%s" % (self.ipaddr, self.port, method)
+        url = f"http://{self.ipaddr}:{self.port}{method}"
         session = requests.Session()
         session.trust_env = False
         session.proxies = None
@@ -25,7 +25,7 @@ class Agent(object):
 
     def post(self, method, **kwargs):
         """Wrapper around POST requests."""
-        url = "http://%s:%s%s" % (self.ipaddr, self.port, method)
+        url = f"http://{self.ipaddr}:{self.port}{method}"
         session = requests.Session()
         session.trust_env = False
         session.proxies = None
@@ -33,7 +33,7 @@ class Agent(object):
 
     def postfile(self, method, files, **kwargs):
         """Wrapper around POST requests with attached files."""
-        url = "http://%s:%s%s" % (self.ipaddr, self.port, method)
+        url = f"http://{self.ipaddr}:{self.port}{method}"
         session = requests.Session()
         session.trust_env = False
         session.proxies = None
@@ -86,12 +86,12 @@ class Agent(object):
 
     def killprocess(self, process_name):
         """Terminate a process."""
-        self.execute("taskkill /F /IM %s" % process_name)
+        self.execute(f"taskkill /F /IM {process_name}")
 
     def hostname(self, hostname):
         """Assign a new hostname."""
         cmdline = "wmic computersystem where name=\"%(oldname)s\" " \
-            "call rename name=\"%(newname)s\""
+                "call rename name=\"%(newname)s\""
         args = dict(oldname=self.environ("COMPUTERNAME"), newname=hostname)
 
         # self.execute(cmdline % args, shell=True)
@@ -108,9 +108,11 @@ class Agent(object):
             session.trust_env = False
             session.proxies = None
             session.post(
-                "http://%s:%s/execute" % (self.ipaddr, self.port),
-                data={"command": command}, timeout=5
+                f"http://{self.ipaddr}:{self.port}/execute",
+                data={"command": command},
+                timeout=5,
             )
+
         except requests.exceptions.ReadTimeout:
             pass
 

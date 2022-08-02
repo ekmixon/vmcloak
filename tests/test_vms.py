@@ -22,7 +22,7 @@ def call(function, *args):
     return function.main(args, standalone_mode=False)
 
 def genname(osversion):
-    return "%s-%s" % (osversion, os.path.basename(dirpath))
+    return f"{osversion}-{os.path.basename(dirpath)}"
 
 def test_ipaddr_increase():
     assert misc.ipaddr_increase("1.2.3.4") == "1.2.3.5"

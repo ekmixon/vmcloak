@@ -13,11 +13,7 @@ def valid_serial_key(serial_key):
     if len(parts) != 5:
         return False
 
-    for part in parts:
-        if not re.match("[A-Z0-9]{5}$", part):
-            return False
-
-    return True
+    return all(re.match("[A-Z0-9]{5}$", part) for part in parts)
 
 def valid_keyboard_layout(kblayout):
     kblayout_txt = os.path.join(VMCLOAK_ROOT, "data", "winxp",

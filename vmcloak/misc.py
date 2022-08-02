@@ -82,11 +82,7 @@ def copytreeinto(srcdir, dstdir):
 def ini_read(path):
     ret, section = {}, None
 
-    if os.path.exists(path):
-        buf = open(path, "rb").read()
-    else:
-        buf = ""
-
+    buf = open(path, "rb").read() if os.path.exists(path) else ""
     # UTF-16 Byte Order Mark ("BOM")
     mode = "utf16" if buf[:2] == "\xff\xfe" else "latin1"
     buf = buf.decode(mode)
@@ -105,15 +101,14 @@ def ini_read(path):
             ret[section].append(line)
         else:
             a, b = line.split("=", 1)
-            ret[section].append("%s=%s" % (a.strip(), b.strip()))
+            ret[section].append(f"{a.strip()}={b.strip()}")
     return mode, ret
 
 def ini_write(path, mode, data):
     lines = [""]
     for key in sorted(data.keys()):
-        lines.append("[%s]" % key)
-        for value in sorted(data[key]):
-            lines.append(value)
+        lines.append(f"[{key}]")
+        lines.extend(iter(sorted(data[key])))
         lines.append("")
     open(path, "wb").write("\r\n".join(lines).encode(mode))
 
@@ -158,10 +153,7 @@ def ini_read_dict(path):
     c = ConfigParser()
     c.read(path)
 
-    ret = {}
-    for section in c.sections():
-        ret[section] = dict(c.items(section))
-    return ret
+    return {section: dict(c.items(section)) for section in c.sections()}
 
 def sha1_file(path):
     """Calculate the sha1 hash of a file."""
@@ -169,11 +161,11 @@ def sha1_file(path):
     f = open(path, "rb")
 
     while True:
-        buf = f.read(1024*1024)
-        if not buf:
-            break
+        if buf := f.read(1024 * 1024):
+            h.update(buf)
 
-        h.update(buf)
+        else:
+            break
 
     return h.hexdigest()
 
@@ -194,7 +186,7 @@ def register_cuckoo(hostonly_ip, tags, vmname, cuckoo_dirpath, rdp_port=None):
             ]
 
             if rdp_port:
-                args += ["--rdp_port", "%s" % rdp_port]
+                args += ["--rdp_port", f"{rdp_port}"]
 
             subprocess.check_call(args, cwd=cuckoo_dirpath)
             return True
@@ -231,7 +223,6 @@ def wait_for_host(ipaddr, port):
             break
         except socket.error:
             log.debug("Waiting for host %s", ipaddr)
-            pass
         time.sleep(1)
 
 def drop_privileges(user):
@@ -248,9 +239,9 @@ def drop_privileges(user):
         os.setuid(user.pw_uid)
         os.environ["HOME"] = user.pw_dir
     except KeyError:
-        sys.exit("Invalid user specified to drop privileges to: %s" % user)
+        sys.exit(f"Invalid user specified to drop privileges to: {user}")
     except OSError as e:
-        sys.exit("Failed to drop privileges: %s" % e)
+        sys.exit(f"Failed to drop privileges: {e}")
 
 def import_plugins(dirpath, module_prefix, namespace, class_):
     """Import plugins of type `class` located at `dirpath` into the
@@ -262,7 +253,7 @@ def import_plugins(dirpath, module_prefix, namespace, class_):
     for fname in os.listdir(dirpath):
         if fname.endswith(".py") and not fname.startswith("__init__"):
             module_name, _ = os.path.splitext(fname)
-            importlib.import_module("%s.%s" % (module_prefix, module_name))
+            importlib.import_module(f"{module_prefix}.{module_name}")
 
     plugins = []
     for subclass in class_.__subclasses__():

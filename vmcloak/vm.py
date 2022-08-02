@@ -28,11 +28,7 @@ class VirtualBox(Machinery):
         cmd = [self.vboxmanage] + list(args)
 
         for k, v in kwargs.items():
-            if v is None or v is True:
-                cmd += ["--" + k]
-            else:
-                cmd += ["--" + k.rstrip("_"), str(v)]
-
+            cmd += [f"--{k}"] if v is None or v is True else ["--" + k.rstrip("_"), str(v)]
         try:
             log.debug("Running command: %s", cmd)
             ret = subprocess.check_output(cmd)
@@ -223,8 +219,13 @@ class VirtualBox(Machinery):
         return self._call("modifyvm", self.name, mouse=type)
 
     def vrde(self, port=3389, password=""):
-        return self._call("modifyvm", self.name, vrde="on", vrdeport=port,
-                          vrdeproperty="VNCPassword=%s" % password)
+        return self._call(
+            "modifyvm",
+            self.name,
+            vrde="on",
+            vrdeport=port,
+            vrdeproperty=f"VNCPassword={password}",
+        )
 
     def paravirtprovider(self, provider):
         return self._call("modifyvm", self.name, paravirtprovider=provider)

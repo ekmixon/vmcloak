@@ -25,13 +25,13 @@ class Modified(Dependency):
         self.a.upload("C:\\modified_agent.py", open(agent, "rb").read())
 
         # Determine what OS we're running as sysnative only exists on 64bit Vista onwards, all 32bit Windows do not have sysnative.
-        if self.i.osversion == "winxp" or self.i.osversion == "win7x86" or self.i.osversion == "win81x86" or self.i.osversion == "win10x86":
+        if self.i.osversion in ["winxp", "win7x86", "win81x86", "win10x86"]:
             REG = "C:\\Windows\\System32\\reg.exe"
-        if self.i.osversion == "win7x64" or self.i.osversion == "win81x64" or self.i.osversion == "win10x64":
+        if self.i.osversion in ["win7x64", "win81x64", "win10x64"]:
             REG = "C:\\Windows\\sysnative\\reg.exe"
-        
+
         # Use same Python instance as main agent.
-        r = self.a.execute("%s query %s /v Agent" % (REG, RUN))
+        r = self.a.execute(f"{REG} query {RUN} /v Agent")
         python = None
         lines = r.json()["stdout"].split("\r\n")
         for line in lines:

@@ -15,7 +15,7 @@ fileConfig(context.config.config_file_name)
 
 target_metadata = Base.metadata
 
-url = "sqlite:///%s" % repository
+url = f"sqlite:///{repository}"
 
 def run_migrations_offline():
     """Run migrations in 'offline' mode.

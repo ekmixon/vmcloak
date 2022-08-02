@@ -61,7 +61,7 @@ class Swarm(object):
         try:
             cfg = yaml.load(open(self.confpath, "rb"))
         except yaml.YAMLError as e:
-            raise SwarmError("Error reading swarm configuration: %s" % e)
+            raise SwarmError(f"Error reading swarm configuration: {e}")
 
         if not isinstance(cfg, dict):
             raise SwarmError("Swarm configuration should be a dictionary!")
@@ -124,7 +124,7 @@ class Swarm(object):
         }
 
         if m["os"] in self.vms:
-            ret.update(self.vms[m["os"]])
+            ret |= self.vms[m["os"]]
         else:
             ret.update(self.parse_machine(m["os"]))
 
@@ -192,11 +192,7 @@ class Swarm(object):
                         continue
 
                     if isinstance(entry, (int, float, basestring)):
-                        ret.append({
-                            "os": target_os,
-                            "dependency": dependency,
-                            "version": "%s" % entry,
-                        })
+                        ret.append({"os": target_os, "dependency": dependency, "version": f"{entry}"})
                         continue
 
                     raise SwarmError(
@@ -218,10 +214,10 @@ class Swarm(object):
         for name, machine in self.machines.items():
             deps = []
             for dep in machine["deps"]:
-                versions = []
-                for version in dep:
-                    if not version["os"] or version["os"] == machine["os"]:
-                        versions.append(version)
-                if versions:
+                if versions := [
+                    version
+                    for version in dep
+                    if not version["os"] or version["os"] == machine["os"]
+                ]:
                     deps.append(versions)
             machine["deps"] = deps

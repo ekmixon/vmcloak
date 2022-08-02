@@ -30,16 +30,16 @@ class WindowsXP(OperatingSystem):
         values = {
             "PRODUCTKEY": self.serial_key,
             "COMPUTERNAME": random_string(8, 16),
-            "FULLNAME": "%s %s" % (random_string(4, 8), random_string(4, 10)),
+            "FULLNAME": f"{random_string(4, 8)} {random_string(4, 10)}",
             "ORGANIZATION": "",
             "WORKGROUP": random_string(4, 8),
-            # "KBLAYOUT": s.keyboard_layout,
             "KBLAYOUT": "US",
         }
 
+
         buf = open(os.path.join(self.path, "winnt.sif"), "rb").read()
         for key, value in values.items():
-            buf = buf.replace("@%s@" % key, value)
+            buf = buf.replace(f"@{key}@", value)
 
         fd, winntsif = tempfile.mkstemp(suffix=".sif", dir=self.tempdir)
         os.write(fd, buf)
